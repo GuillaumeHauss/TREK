@@ -205,6 +205,7 @@ function runMigrations(db: Database.Database): void {
       try { db.exec('ALTER TABLE reservations ADD COLUMN accommodation_id INTEGER REFERENCES day_accommodations(id) ON DELETE SET NULL'); } catch {}
       try { db.exec('ALTER TABLE reservations ADD COLUMN metadata TEXT'); } catch {}
     },
+    () => db.exec('ALTER TABLE recipe_ingredients ADD COLUMN domain TEXT DEFAULT \'Other\''),
   ];
 
   if (currentVersion < migrations.length) {

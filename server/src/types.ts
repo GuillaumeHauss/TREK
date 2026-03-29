@@ -296,3 +296,43 @@ export interface Participant {
   username: string;
   avatar?: string | null;
 }
+
+export interface Recipe {
+  id: number;
+  trip_id: number;
+  name: string;
+  description?: string | null;
+  servings: number;
+  sort_order: number;
+  created_at?: string;
+}
+
+export interface RecipeIngredient {
+  id: number;
+  recipe_id: number;
+  name: string;
+  quantity?: number | null;
+  unit?: string | null;
+  sort_order: number;
+}
+
+export interface RecipeUstensil {
+  id: number;
+  recipe_id: number;
+  name: string;
+  quantity: number;
+  sort_order: number;
+}
+
+export interface GroceryItem {
+  id: number;
+  trip_id: number;
+  name: string;
+  quantity: number;
+  unit?: string | null;
+  domain: string;
+  checked: number;
+  is_manual: number;
+  sort_order: number;
+  created_at?: string;
+}

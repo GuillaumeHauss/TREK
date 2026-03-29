@@ -79,6 +79,43 @@ if (shouldForceHttps) {
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Request/response logging (for debugging API issues)
+const logFilePath = path.join(__dirname, '../data/api-requests.log');
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const startTime = Date.now();
+  const requestLog = {
+    time: new Date().toISOString(),
+    method: req.method,
+    url: req.originalUrl,
+    tripId: req.params.tripId || null,
+    body: req.body,
+    query: req.query,
+    headers: {
+      authorization: req.headers.authorization,
+      'x-socket-id': req.headers['x-socket-id'],
+    },
+  };
+
+  const originalSend = res.send.bind(res);
+  res.send = (body?: any) => {
+    const duration = Date.now() - startTime;
+    const responseLog = {
+      ...requestLog,
+      status: res.statusCode,
+      durationMs: duration,
+      responseBody: body,
+    };
+
+    fs.appendFile(logFilePath, JSON.stringify(responseLog) + '\n', (err) => {
+      if (err) console.error('Failed to write API log', err);
+    });
+
+    return originalSend(body);
+  };
+
+  next();
+});
+
 // Avatars are public (shown on login, sharing screens)
 app.use('/uploads/avatars', express.static(path.join(__dirname, '../uploads/avatars')));
 
@@ -120,6 +157,7 @@ import budgetRoutes from './routes/budget';
 import collabRoutes from './routes/collab';
 import backupRoutes from './routes/backup';
 import oidcRoutes from './routes/oidc';
+import groceriesRoutes from './routes/groceries';
 app.use('/api/auth', authRoutes);
 app.use('/api/auth/oidc', oidcRoutes);
 app.use('/api/trips', tripsRoutes);
@@ -127,6 +165,7 @@ app.use('/api/trips/:tripId/days', daysRoutes);
 app.use('/api/trips/:tripId/accommodations', accommodationsRoutes);
 app.use('/api/trips/:tripId/places', placesRoutes);
 app.use('/api/trips/:tripId/packing', packingRoutes);
+app.use('/api/trips/:tripId/groceries', groceriesRoutes);
 app.use('/api/trips/:tripId/files', filesRoutes);
 app.use('/api/trips/:tripId/budget', budgetRoutes);
 app.use('/api/trips/:tripId/collab', collabRoutes);

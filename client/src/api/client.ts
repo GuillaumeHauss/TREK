@@ -250,4 +250,19 @@ export const backupApi = {
   setAutoSettings: (settings: Record<string, unknown>) => apiClient.put('/backup/auto-settings', settings).then(r => r.data),
 }
 
+export const groceriesApi = {
+  getRecipes: (tripId: number | string) => apiClient.get(`/trips/${tripId}/groceries/recipes`).then(r => r.data.recipes),
+  createRecipe: (tripId: number | string, data: Record<string, unknown>) => apiClient.post(`/trips/${tripId}/groceries/recipes`, data).then(r => r.data.recipe),
+  updateRecipe: (tripId: number | string, recipeId: number, data: Record<string, unknown>) => apiClient.put(`/trips/${tripId}/groceries/recipes/${recipeId}`, data).then(r => r.data.recipe),
+  deleteRecipe: (tripId: number | string, recipeId: number) => apiClient.delete(`/trips/${tripId}/groceries/recipes/${recipeId}`).then(r => r.data),
+  addIngredient: (tripId: number | string, recipeId: number, data: Record<string, unknown>) => apiClient.post(`/trips/${tripId}/groceries/recipes/${recipeId}/ingredients`, data).then(r => r.data.ingredient),
+  updateIngredient: (tripId: number | string, recipeId: number, ingredientId: number, data: Record<string, unknown>) => apiClient.put(`/trips/${tripId}/groceries/recipes/${recipeId}/ingredients/${ingredientId}`, data).then(r => r.data.ingredient),
+  deleteIngredient: (tripId: number | string, recipeId: number, ingredientId: number) => apiClient.delete(`/trips/${tripId}/groceries/recipes/${recipeId}/ingredients/${ingredientId}`).then(r => r.data),
+  getGroceryItems: (tripId: number | string) => apiClient.get(`/trips/${tripId}/groceries`).then(r => r.data.items),
+  createGroceryItem: (tripId: number | string, data: Record<string, unknown>) => apiClient.post(`/trips/${tripId}/groceries`, data).then(r => r.data.item),
+  updateGroceryItem: (tripId: number | string, itemId: number, data: Record<string, unknown>) => apiClient.put(`/trips/${tripId}/groceries/${itemId}`, data).then(r => r.data.item),
+  deleteGroceryItem: (tripId: number | string, itemId: number) => apiClient.delete(`/trips/${tripId}/groceries/${itemId}`).then(r => r.data),
+  addFromRecipe: (tripId: number | string, recipeId: number, servings?: number) => apiClient.post(`/trips/${tripId}/groceries/add-from-recipe/${recipeId}`, { servings }).then(r => r.data.items),
+}
+
 export default apiClient

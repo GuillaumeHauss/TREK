@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    container_name: trek-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET:-}
+      # - ALLOWED_ORIGINS=https://yourdomain.com  # Optional: restrict CORS to specific origins
+      - PORT=3000
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

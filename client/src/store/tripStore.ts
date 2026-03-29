@@ -8,10 +8,11 @@ import { createPackingSlice } from './slices/packingSlice'
 import { createBudgetSlice } from './slices/budgetSlice'
 import { createReservationsSlice } from './slices/reservationsSlice'
 import { createFilesSlice } from './slices/filesSlice'
+import { createGroceriesSlice } from './slices/groceriesSlice'
 import { handleRemoteEvent } from './slices/remoteEventHandler'
 import type {
   Trip, Day, Place, Assignment, DayNote, PackingItem,
-  Tag, Category, BudgetItem, TripFile, Reservation,
+  Tag, Category, BudgetItem, TripFile, Reservation, Recipe, GroceryItem, ShoppingListDomain,
   AssignmentsMap, DayNotesMap, WebSocketEvent,
 } from '../types'
 import { getApiErrorMessage } from '../types'
@@ -22,6 +23,7 @@ import type { PackingSlice } from './slices/packingSlice'
 import type { BudgetSlice } from './slices/budgetSlice'
 import type { ReservationsSlice } from './slices/reservationsSlice'
 import type { FilesSlice } from './slices/filesSlice'
+import type { GroceriesSlice } from './slices/groceriesSlice'
 
 export interface TripStoreState
   extends PlacesSlice,
@@ -30,7 +32,8 @@ export interface TripStoreState
     PackingSlice,
     BudgetSlice,
     ReservationsSlice,
-    FilesSlice {
+    FilesSlice,
+    GroceriesSlice {
   trip: Trip | null
   days: Day[]
   places: Place[]
@@ -172,4 +175,5 @@ export const useTripStore = create<TripStoreState>((set, get) => ({
   ...createBudgetSlice(set, get),
   ...createReservationsSlice(set, get),
   ...createFilesSlice(set, get),
+  ...createGroceriesSlice(set, get),
 }))

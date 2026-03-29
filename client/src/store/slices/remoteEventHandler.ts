@@ -232,6 +232,28 @@ export function handleRemoteEvent(set: SetState, event: WebSocketEvent): void {
           files: state.files.filter(f => f.id !== payload.fileId),
         }
 
+      // Groceries
+      case 'groceries:recipe:created':
+        return state._onRecipeCreated ? state._onRecipeCreated(payload.recipe) || {} : {}
+      case 'groceries:recipe:updated':
+        return state._onRecipeUpdated ? state._onRecipeUpdated(payload.recipe) || {} : {}
+      case 'groceries:recipe:deleted':
+        return state._onRecipeDeleted ? state._onRecipeDeleted(payload.recipeId) || {} : {}
+      case 'groceries:ingredient:created':
+        return state._onIngredientCreated ? state._onIngredientCreated(payload.ingredient, payload.recipeId) || {} : {}
+      case 'groceries:ingredient:updated':
+        return state._onIngredientUpdated ? state._onIngredientUpdated(payload.ingredient, payload.recipeId) || {} : {}
+      case 'groceries:ingredient:deleted':
+        return state._onIngredientDeleted ? state._onIngredientDeleted(payload.ingredientId, payload.recipeId) || {} : {}
+      case 'groceries:item:created':
+        return state._onGroceryItemCreated ? state._onGroceryItemCreated(payload.item) || {} : {}
+      case 'groceries:item:updated':
+        return state._onGroceryItemUpdated ? state._onGroceryItemUpdated(payload.item) || {} : {}
+      case 'groceries:item:deleted':
+        return state._onGroceryItemDeleted ? state._onGroceryItemDeleted(payload.itemId) || {} : {}
+      case 'groceries:items:added':
+        return state._onGroceryItemsAdded ? state._onGroceryItemsAdded(payload.items) || {} : {}
+
       default:
         return {}
     }

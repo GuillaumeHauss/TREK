@@ -303,6 +303,48 @@ function createTables(db: Database.Database): void {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
+    -- Groceries feature tables
+    CREATE TABLE IF NOT EXISTS recipes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      description TEXT,
+      servings INTEGER DEFAULT 1,
+      sort_order INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS recipe_ingredients (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      recipe_id INTEGER NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      quantity REAL,
+      unit TEXT,
+      domain TEXT DEFAULT 'Other',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS recipe_ustensils (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      recipe_id INTEGER NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      quantity INTEGER DEFAULT 1,
+      sort_order INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS grocery_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      quantity REAL DEFAULT 1,
+      unit TEXT,
+      domain TEXT DEFAULT 'Other',
+      checked INTEGER DEFAULT 0,
+      is_manual INTEGER DEFAULT 1,
+      sort_order INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     -- Collab addon tables
     CREATE TABLE IF NOT EXISTS collab_notes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -370,6 +412,10 @@ function createTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_photos_trip_id ON photos(trip_id);
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     CREATE INDEX IF NOT EXISTS idx_day_accommodations_trip_id ON day_accommodations(trip_id);
+    CREATE INDEX IF NOT EXISTS idx_recipes_trip_id ON recipes(trip_id);
+    CREATE INDEX IF NOT EXISTS idx_recipe_ingredients_recipe_id ON recipe_ingredients(recipe_id);
+    CREATE INDEX IF NOT EXISTS idx_recipe_ustensils_recipe_id ON recipe_ustensils(recipe_id);
+    CREATE INDEX IF NOT EXISTS idx_grocery_items_trip_id ON grocery_items(trip_id);
 
     CREATE TABLE IF NOT EXISTS assignment_participants (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

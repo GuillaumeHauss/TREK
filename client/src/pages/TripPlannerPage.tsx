@@ -14,6 +14,7 @@ import TripMembersModal from '../components/Trips/TripMembersModal'
 import { ReservationModal } from '../components/Planner/ReservationModal'
 import ReservationsPanel from '../components/Planner/ReservationsPanel'
 import PackingListPanel from '../components/Packing/PackingListPanel'
+import GroceriesPanel from '../components/Groceries/GroceriesPanel'
 import FileManager from '../components/Files/FileManager'
 import BudgetPanel from '../components/Budget/BudgetPanel'
 import CollabPanel from '../components/Collab/CollabPanel'
@@ -38,7 +39,7 @@ export default function TripPlannerPage(): React.ReactElement | null {
   const tripStore = useTripStore()
   const { trip, days, places, assignments, packingItems, categories, reservations, budgetItems, files, selectedDayId, isLoading } = tripStore
 
-  const [enabledAddons, setEnabledAddons] = useState<Record<string, boolean>>({ packing: true, budget: true, documents: true })
+  const [enabledAddons, setEnabledAddons] = useState<Record<string, boolean>>({ packing: true, budget: true, documents: true, groceries: true })
   const [tripAccommodations, setTripAccommodations] = useState<Accommodation[]>([])
   const [allowedFileTypes, setAllowedFileTypes] = useState<string | null>(null)
   const [tripMembers, setTripMembers] = useState<TripMember[]>([])
@@ -54,7 +55,7 @@ export default function TripPlannerPage(): React.ReactElement | null {
     addonsApi.enabled().then(data => {
       const map = {}
       data.addons.forEach(a => { map[a.id] = true })
-      setEnabledAddons({ packing: !!map.packing, budget: !!map.budget, documents: !!map.documents, collab: !!map.collab })
+      setEnabledAddons({ packing: !!map.packing, budget: !!map.budget, documents: !!map.documents, collab: !!map.collab, groceries: true })
     }).catch(() => {})
     authApi.getAppConfig().then(config => {
       if (config.allowed_file_types) setAllowedFileTypes(config.allowed_file_types)
@@ -66,6 +67,7 @@ export default function TripPlannerPage(): React.ReactElement | null {
     { id: 'buchungen', label: t('trip.tabs.reservations'), shortLabel: t('trip.tabs.reservationsShort') },
     ...(enabledAddons.packing ? [{ id: 'packliste', label: t('trip.tabs.packing'), shortLabel: t('trip.tabs.packingShort') }] : []),
     ...(enabledAddons.budget ? [{ id: 'finanzplan', label: t('trip.tabs.budget') }] : []),
+    ...(enabledAddons.groceries ? [{ id: 'groceries', label: 'Groceries' }] : []),
     ...(enabledAddons.documents ? [{ id: 'dateien', label: t('trip.tabs.files') }] : []),
     ...(enabledAddons.collab ? [{ id: 'collab', label: t('admin.addons.catalog.collab.name') }] : []),
   ]
@@ -80,6 +82,10 @@ export default function TripPlannerPage(): React.ReactElement | null {
     sessionStorage.setItem(`trip-tab-${tripId}`, tabId)
     if (tabId === 'finanzplan') tripStore.loadBudgetItems?.(tripId)
     if (tabId === 'dateien' && (!files || files.length === 0)) tripStore.loadFiles?.(tripId)
+    if (tabId === 'groceries') {
+      tripStore.loadRecipes?.(tripId)
+      tripStore.loadGroceryItems?.(tripId)
+    }
   }
   const { leftWidth, rightWidth, leftCollapsed, rightCollapsed, setLeftCollapsed, setRightCollapsed, startResizeLeft, startResizeRight } = useResizablePanels()
   const { selectedPlaceId, selectedAssignmentId, setSelectedPlaceId, selectAssignment } = usePlaceSelection()
@@ -623,6 +629,28 @@ export default function TripPlannerPage(): React.ReactElement | null {
         {activeTab === 'packliste' && (
           <div style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'contain', maxWidth: 1200, margin: '0 auto', width: '100%', padding: '8px 0' }}>
             <PackingListPanel tripId={tripId} items={packingItems} />
+          </div>
+        )}
+
+        {activeTab === 'groceries' && (
+          <div style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'contain', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+            <GroceriesPanel
+              tripId={tripId}
+              recipes={tripStore.recipes || []}
+              groceryItems={tripStore.groceryItems || []}
+              onLoadRecipes={tripStore.loadRecipes}
+              onLoadGroceryItems={tripStore.loadGroceryItems}
+              onCreateRecipe={tripStore.createRecipe}
+              onUpdateRecipe={tripStore.updateRecipe}
+              onDeleteRecipe={tripStore.deleteRecipe}
+              onAddRecipeIngredient={tripStore.addRecipeIngredient}
+              onUpdateRecipeIngredient={tripStore.updateRecipeIngredient}
+              onDeleteRecipeIngredient={tripStore.deleteRecipeIngredient}
+              onAddGroceryItem={tripStore.addGroceryItem}
+              onUpdateGroceryItem={tripStore.updateGroceryItem}
+              onDeleteGroceryItem={tripStore.deleteGroceryItem}
+              onAddRecipeIngredientsToShoppingList={tripStore.addRecipeIngredientsToShoppingList}
+            />
           </div>
         )}
 
